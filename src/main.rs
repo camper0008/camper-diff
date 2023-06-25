@@ -4,6 +4,13 @@ mod colored_char;
 mod diff;
 mod io;
 
+fn remove_last_newline(chars: &mut Vec<ColoredChar>) {
+    if !chars.is_empty() {
+        let char = chars.pop().expect("length > 0");
+        assert_eq!(char, ColoredChar::Newline);
+    }
+}
+
 fn main() {
     let (left, right) = match io::files() {
         Ok(v) => v,
@@ -17,19 +24,16 @@ fn main() {
 
     let mut chars: Vec<ColoredChar> = lines
         .map(|(line_number, line)| line_to_colored_chars(line_number, line))
-        .map(|zipped_lines| -> Vec<ColoredChar> {
+        .flat_map(|zipped_lines| -> Vec<ColoredChar> {
             let (left, right): (Vec<_>, Vec<_>) = zipped_lines.unzip();
             left.into_iter()
                 .chain(right.into_iter())
                 .flatten()
                 .collect()
         })
-        .flatten()
         .collect();
 
-    if chars.len() > 0 {
-        chars.pop().expect("pop newline");
-    }
+    remove_last_newline(&mut chars);
 
     print_chars(chars);
 }

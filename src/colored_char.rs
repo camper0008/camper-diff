@@ -2,7 +2,7 @@ use colored::Colorize;
 
 use crate::diff::Diff;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, PartialEq)]
 pub enum ColoredChar {
     Unimportant(char),
     LineNumber(char),
@@ -59,11 +59,9 @@ pub fn line_to_colored_chars(
     left_buffer.zip(right_buffer).chain(chars).chain(newlines)
 }
 
-fn prepare_buffer<'a>(line_number: usize, hook: ColoredChar) -> Vec<Vec<ColoredChar>> {
+fn prepare_buffer(line_number: usize, hook: ColoredChar) -> Vec<Vec<ColoredChar>> {
     let line_number = line_number.to_string();
-    let line_number = line_number
-        .chars()
-        .map(|char| ColoredChar::LineNumber(char));
+    let line_number = line_number.chars().map(ColoredChar::LineNumber);
 
     let rest = vec![
         ColoredChar::Unimportant(':'),
@@ -75,7 +73,7 @@ fn prepare_buffer<'a>(line_number: usize, hook: ColoredChar) -> Vec<Vec<ColoredC
     ]
     .into_iter();
 
-    line_number.chain(rest).map(|char| char.wrap()).collect()
+    line_number.chain(rest).map(ColoredChar::wrap).collect()
 }
 
 pub fn print_chars(chars: Vec<ColoredChar>) {
@@ -99,10 +97,7 @@ pub fn print_chars(chars: Vec<ColoredChar>) {
 fn empty_line_once(should_appear: &mut bool) -> Vec<ColoredChar> {
     if *should_appear {
         *should_appear = false;
-        "empty line"
-            .chars()
-            .map(|char| ColoredChar::Unimportant(char))
-            .collect()
+        "empty line".chars().map(ColoredChar::Unimportant).collect()
     } else {
         vec![]
     }
