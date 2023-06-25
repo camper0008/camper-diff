@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 colored = "2.0.0"
-diff = "0.1.13"
+itertools = "0.11.0"
 
 [[bin]]
 path="src/main.rs"
