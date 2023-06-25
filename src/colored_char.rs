@@ -7,10 +7,8 @@ pub enum ColoredChar {
     Unimportant(char),
     LineNumber(char),
     Same(char),
-    HookLeft(char),
-    HookRight(char),
-    DifferentLeft(char),
-    DifferentRight(char),
+    Left(char),
+    Right(char),
     Space,
     Newline,
     Blank,
@@ -26,28 +24,32 @@ pub fn line_to_colored_chars(
     line_number: usize,
     line: Vec<Diff<Option<char>>>,
 ) -> impl Iterator<Item = (Vec<ColoredChar>, Vec<ColoredChar>)> {
-    let left_buffer = prepare_buffer(line_number, ColoredChar::HookLeft('<')).into_iter();
-    let right_buffer = prepare_buffer(line_number, ColoredChar::HookRight('>')).into_iter();
+    let left_buffer = prepare_buffer(line_number, ColoredChar::Left('<')).into_iter();
+    let right_buffer = prepare_buffer(line_number, ColoredChar::Right('>')).into_iter();
     let mut empty_line_should_appear = true;
 
-    let chars = line.into_iter().map(move |diff| match diff {
-        Diff::Same(Some(char)) => (
-            ColoredChar::Same(char).wrap(),
-            ColoredChar::Same(char).wrap(),
-        ),
-        Diff::Different(Some(left), None) => (
-            ColoredChar::Same(left).wrap(),
-            empty_line_once(&mut empty_line_should_appear),
-        ),
-        Diff::Different(None, Some(right)) => (
-            empty_line_once(&mut empty_line_should_appear),
-            ColoredChar::Same(right).wrap(),
-        ),
-        Diff::Different(Some(left), Some(right)) => (
-            ColoredChar::DifferentLeft(left).wrap(),
-            ColoredChar::DifferentRight(right).wrap(),
-        ),
-        Diff::Same(None) | Diff::Different(None, None) => unreachable!(),
+    let chars = line.into_iter().map(move |diff| {
+        let (left, right) = match diff {
+            Diff::Same(Some(char)) => (
+                ColoredChar::Same(char).wrap(),
+                ColoredChar::Same(char).wrap(),
+            ),
+            Diff::Different(Some(left), None) => (
+                ColoredChar::Same(left).wrap(),
+                empty_line_once(&mut empty_line_should_appear),
+            ),
+            Diff::Different(None, Some(right)) => (
+                empty_line_once(&mut empty_line_should_appear),
+                ColoredChar::Same(right).wrap(),
+            ),
+            Diff::Different(Some(left), Some(right)) => (
+                ColoredChar::Left(left).wrap(),
+                ColoredChar::Right(right).wrap(),
+            ),
+            Diff::Same(None) | Diff::Different(None, None) => unreachable!(),
+        };
+        empty_line_should_appear = false;
+        (left, right)
     });
 
     let newlines = vec![
@@ -83,10 +85,8 @@ pub fn print_chars(chars: Vec<ColoredChar>) {
             ColoredChar::Unimportant(char) => char.to_string().white(),
             ColoredChar::LineNumber(char) => char.to_string().yellow(),
             ColoredChar::Same(char) => char.to_string().bright_white(),
-            ColoredChar::HookLeft(char) => char.to_string().red(),
-            ColoredChar::HookRight(char) => char.to_string().green(),
-            ColoredChar::DifferentLeft(char) => char.to_string().red(),
-            ColoredChar::DifferentRight(char) => char.to_string().green(),
+            ColoredChar::Left(char) => char.to_string().red(),
+            ColoredChar::Right(char) => char.to_string().green(),
             ColoredChar::Space => " ".white(),
             ColoredChar::Newline => "\n".white(),
             ColoredChar::Blank => "".white(),
