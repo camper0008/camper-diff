@@ -4,13 +4,13 @@ fn operands() -> Result<(String, String), String> {
     let mut args = env::args();
     let name = args
         .next()
-        .ok_or("cdiff: unreachable: called process without process name".to_string())?;
+        .ok_or_else(|| "cdiff: unreachable: called process without process name".to_string())?;
     let left = args
         .next()
-        .ok_or(format!("cdiff: missing operand after '{name}'"))?;
+        .ok_or_else(|| format!("cdiff: missing operand after '{name}'"))?;
     let right = args
         .next()
-        .ok_or(format!("cdiff: missing operand after '{left}'"))?;
+        .ok_or_else(|| format!("cdiff: missing operand after '{left}'"))?;
     args.next().map_or(Ok(()), |extra| {
         Err(format!("cdiff: extra operand '{extra}'"))
     })?;

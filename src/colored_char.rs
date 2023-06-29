@@ -2,7 +2,7 @@ use colored::Colorize;
 
 use crate::diff::Diff;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum ColoredChar {
     Unimportant(char),
     LineNumber(char),
