@@ -1,8 +1,6 @@
-use colored_char::{line_to_colored_chars, print_chars, ColoredChar};
-
-mod colored_char;
-mod diff;
-mod io;
+use camper_diff::colored_char::{line_to_colored_chars, print_chars, ColoredChar};
+use camper_diff::diff;
+use camper_diff::io;
 
 fn remove_last_newline(chars: &mut Vec<ColoredChar>) {
     if !chars.is_empty() {
@@ -32,8 +30,6 @@ fn main() {
                 .collect()
         })
         .collect();
-
     remove_last_newline(&mut chars);
-
     print_chars(chars);
 }
