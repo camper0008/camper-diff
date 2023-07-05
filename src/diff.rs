@@ -6,7 +6,7 @@ pub enum Diff<T> {
     Different(T, T),
 }
 
-pub fn chars<'a>(left: Option<&'a str>, right: Option<&'a str>) -> Vec<Diff<Option<char>>> {
+fn chars<'a>(left: Option<&'a str>, right: Option<&'a str>) -> Vec<Diff<Option<char>>> {
     let (left, right) = match (left, right) {
         (None, Some(right)) => {
             return right
@@ -36,7 +36,7 @@ pub fn chars<'a>(left: Option<&'a str>, right: Option<&'a str>) -> Vec<Diff<Opti
         .collect()
 }
 
-pub fn lines<'a>(
+fn lines<'a>(
     left: &'a str,
     right: &'a str,
 ) -> impl Iterator<Item = (usize, Diff<Option<&'a str>>)> {

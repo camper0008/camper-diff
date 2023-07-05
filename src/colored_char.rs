@@ -85,8 +85,14 @@ pub fn print_chars(chars: Vec<ColoredChar>) {
             ColoredChar::Unimportant(char) => char.to_string().white(),
             ColoredChar::LineNumber(char) => char.to_string().yellow(),
             ColoredChar::Same(char) => char.to_string().bright_white(),
-            ColoredChar::Left(char) => char.to_string().red(),
-            ColoredChar::Right(char) => char.to_string().green(),
+            ColoredChar::Left(char) => match char {
+                ' ' => "·".to_string().on_red(),
+                char => char.to_string().red(),
+            },
+            ColoredChar::Right(char) => match char {
+                ' ' => "·".to_string().on_green(),
+                char => char.to_string().green(),
+            },
             ColoredChar::Space => " ".white(),
             ColoredChar::Newline => "\n".white(),
             ColoredChar::Blank => "".white(),
